@@ -5,8 +5,11 @@ import android.app.Fragment;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
+import android.nfc.Tag;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.app.ActivityCompat;
@@ -117,6 +120,25 @@ public class MainActivity extends FragmentActivity {
         {
             Log.i(TAG, "onNewIntent(): NULL INTENT");
             return;
+        }
+
+        Log.i(TAG, "onNewIntent(): action + " + intent.getAction() + ", Type = " + intent.getType());
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction()))
+        {
+            Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+            Log.i(TAG, "onNewIntent(): tag to string: " + tag.toString());
+
+            Parcelable [] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+            if (rawMsgs != null)
+            {
+                //Parsing through ndef msg?
+                NdefMessage[] msgs = new NdefMessage[rawMsgs.length];
+                for (int i = 0; i<msgs.length; ++i)
+                {
+                    msgs[i] = (NdefMessage) rawMsgs[i];
+                    Log.i(TAG, "onNewIntent() : Message" + i + " = " + msgs[i].toString());
+                }
+            }
         }
     }
 
