@@ -2,8 +2,10 @@ package com.bah.iotsap;
 
 import android.Manifest;
 import android.app.Fragment;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v13.app.FragmentPagerAdapter;
@@ -13,6 +15,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.util.SparseArray;
+import android.widget.Toast;
 
 import com.bah.iotsap.services.BleDiscoveryService;
 import com.bah.iotsap.services.BluetoothDiscoveryService;
@@ -37,6 +40,9 @@ public class MainActivity extends FragmentActivity {
     PagerAdapter pagerAdapter;
     ViewPager viewPager;
 
+    NfcAdapter nfcAdapter;
+    PendingIntent pendingIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +59,23 @@ public class MainActivity extends FragmentActivity {
         viewPager.setAdapter(pagerAdapter);
         viewPager.setCurrentItem(START_INDEX);
 
+        //Set up NFC Adapter
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        pendingIntent = PendingIntent.getActivity(this, 0,
+                new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+        if (nfcAdapter == null)
+        {
+            Log.i(TAG, "NFC CAT");
+            Toast.makeText(this, "No NFC capability", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+        if (!nfcAdapter.isEnabled())
+        {
+            Log.i(TAG, "onCreate(): nfcAdapter is not enabled");
+            Toast.makeText(this, "Please enable NFC Adapter", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+
         /**
          * Request permission for fine location if it is not already granted
          */
@@ -64,6 +87,7 @@ public class MainActivity extends FragmentActivity {
 
         // Service manager handles launching services that are able to run on device
         startService(new Intent(ServiceManager.START, null, this, ServiceManager.class));
+
     }
 
     @Override
@@ -71,6 +95,29 @@ public class MainActivity extends FragmentActivity {
         Log.i(TAG, "onDestroy(): stopping ServiceManager");
         stopService(new Intent(ServiceManager.STOP, null, this, ServiceManager.class));
         super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.i(TAG, "onResume");
+        nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        nfcAdapter.disableForegroundDispatch(this);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (intent == null)
+        {
+            Log.i(TAG, "onNewIntent(): NULL INTENT");
+            return;
+        }
     }
 
     /**
