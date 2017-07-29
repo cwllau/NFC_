@@ -170,7 +170,7 @@ public class MainActivity extends FragmentActivity {
                         BluetoothDiscoveryService.RECEIVE_JSON)); break;
                 case BLE_INDEX : registeredFragments.put(position, ItemFragment.newInstance(
                         BleDiscoveryService.RECEIVE_JSON)); break;
-                case NFC_INDEX : registeredFragments.put(position, ItemFragment.newInstance()); break;
+                case NFC_INDEX : registeredFragments.put(position, new NfcFragment()); break;
                 default: break;
             }
             return registeredFragments.get(position);

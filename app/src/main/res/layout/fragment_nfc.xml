@@ -5,9 +5,33 @@
     tools:context="com.bah.iotsap.NfcFragment">
 
     <!-- TODO: Update blank fragment layout -->
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Read NFC" />
+
+    <Button
+        android:id="@+id/rfid_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Read RFID"
+        android:layout_gravity="center_horizontal"/>
+
     <TextView
+        android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:text="NFC fragment page" />
+
+    <EditText
+        android:id="@+id/rfid_textview"
+        android:layout_width="151dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        />
+
 
 </FrameLayout>
